@@ -1,5 +1,7 @@
 from book import AddressBook
 from record import Record
+from field import *
+from utils import input_error
 
 
 def parse_input(user_input):
@@ -7,50 +9,98 @@ def parse_input(user_input):
     cmd = cmd.strip().lower()
     return cmd, *args
 
-def add_contact(args, contacts):
-    name, phone = args
-    if name in contacts:
-        return "Already exists, update if needed"
-    else:
-        contacts[name] = phone
-        return 'Contact added.'
+@input_error
+def add_contact(args, book):
+    if len(args)< 2:
+        raise ValueError("Please type add name phone")
+    name, phone, *_ = args
+    record = book.find(name)
+    message = "Contact updated."
+    if record is None:
+        record = Record(name)
+        book.add_record(record)
+        message = "Contact added."
+    if phone:
+        record.add_phone(phone)
+    return message
 
-def change_contact(args, contacts):
-    name, phone= args
-    contacts[name]=phone
+@input_error
+def change_contact(args, book):
+    if len(args) != 3 or not Phone(args[1]).value or not Phone(args[2]).value:
+        raise ValueError("Invalid input. Use 'change [name] [old_phone] [new_phone]'")
+    name, old_phone, new_phone, *_ = args
+    record = book.find(name)
+    if record:
+        record.edit_phone(old_phone, new_phone)
     return "Contact updated"
 
-def get_phone(args,contacts):
-    name = args[0]
-    if name in contacts:
-            return contacts.get(name)
+@input_error
+def get_phone(args,book):
+
+    name, *_ = args
+    record=book.find(name)
+    if record:
+        user_phones=[]
+        for phone in record.phones:
+           user_phones.append(phone.value)
+        return f"{name}'s phone numbers: {"; ".join(user_phones)}"
     else:
         return "Not Found"
 
-def get_all(args,contacts):
-    return contacts
+
+def get_all(args,book):
+    return book
+
+@input_error
+def add_birthday(args, book):
+    name, bday,*_ = args
+    record = book.find(name)
+    if record.birthday is None:
+        record.add_birthday(bday)
+    return f"Birthday at {record.birthday} added for {name}"
+
+@input_error
+def show_birthday(args, book):
+    name, *_ = args
+    record = book.find(name)
+    if not record.birthday is None:
+        return f"{name}'s birthday is at {record.birthday}"
+
+def birthdays(args, book):
+    return book.get_upcoming_birthdays()
+
+
 
 def main():
-    contacts = {}
+    book = AddressBook()
     print("Welcome to the assistant bot!")
     while True:
         user_input = input("Enter a command: ")
         command, *args = parse_input(user_input)
 
         if command in ["close", "exit"]:
-            print (contacts)
+            print (book)
             print("Good bye!")
             break
         elif command == "hello":
             print("How can I help you?")
         elif command == "add":
-            print(add_contact(args, contacts))
+            print(add_contact(args, book))
         elif command=="change":
-            print(change_contact(args,contacts))
+            print(change_contact(args,book))
         elif command=="phone":
-            print(get_phone(args,contacts))
+            print(get_phone(args,book))
         elif command=="all":
-            print(get_all(args,contacts))
+            print(get_all(args,book))
+
+        elif command == "add-birthday":
+            print(add_birthday(args, book))
+
+        elif command == "show-birthday":
+            print(show_birthday(args, book))
+
+        elif command == "birthdays":
+            print(birthdays(args, book))
 
         else:
             print("Invalid command.")

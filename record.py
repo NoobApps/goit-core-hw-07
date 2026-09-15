@@ -45,5 +45,5 @@ class Record:
 # john_record.add_phone("1234567890")
 # john_record.add_phone("1234567890")
 # john_record.add_phone("5555555555")
-# john_record.add_birthday('2000.12.01')
-# print(john_record)
+# john_record.add_birthday('16.09.2015')
+# print(john_record.birthday)
