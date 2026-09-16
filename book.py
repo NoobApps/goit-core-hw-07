@@ -21,10 +21,11 @@ class AddressBook(UserDict):
         today = date.today()
         upcoming = []
         for name, record in self.data.items():
-            if record.birthday.value:
-                bday_this_year = record.birthday.value.replace(year=today.year)
+            if not record.birthday is None:
+                
+                bday_this_year = datetime.strptime(record.birthday.value,"%d.%m.%Y").replace(year=today.year).date()
                 if bday_this_year<today:
-                    bday_this_year = record.birthday.value.replace(year=today.year+1)
+                    bday_this_year = datetime.strptime(record.birthday.value,"%d.%m.%Y").replace(year=today.year+1).date()
                 next_week = today + timedelta(days = 7)
                 if bday_this_year.weekday() >= 5:
                     bday_this_year = bday_this_year + timedelta(7-bday_this_year.weekday())
@@ -34,10 +35,7 @@ class AddressBook(UserDict):
                 
             
         return upcoming
-            
-
-
-    
+     
     def __str__(self) ->str:
         result=''
         for name, record in self.data.items():

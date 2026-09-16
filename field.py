@@ -22,14 +22,20 @@ class Phone(Field):
             raise ValueError("Phone number must be 10 digits like:0671234567")
 
 class Birthday(Field):
-    def __init__ (self, birthday : str):
+    def __init__(self, value: str):
         try:
-            bday=datetime.strptime(birthday, "%d.%m.%Y")
-            super().__init__(bday.date())
+            if self.__is_valid(value):
+                self.value = value
         except ValueError:
             raise ValueError("Invalid date format. Use DD.MM.YYYY")
 
+    def __is_valid(self, value):
+        try:
+            datetime.strptime(value, "%d.%m.%Y")
+            return True
+        except ValueError:
+            raise ValueError("Invalid date format. Use DD.MM.YYYY")
     
 
 # bd=Birthday("16.09.2012")
-# print (bd)
+# print (type(bd))

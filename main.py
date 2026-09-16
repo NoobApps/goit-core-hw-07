@@ -76,7 +76,11 @@ def main():
     print("Welcome to the assistant bot!")
     while True:
         user_input = input("Enter a command: ")
-        command, *args = parse_input(user_input)
+        if len(user_input.strip())==0:
+            print("No command entered: try [hello, add, change, all, phone, add-birthday, show-birthday, birthdays]")
+            continue
+        else:
+            command, *args = parse_input(user_input)
 
         if command in ["close", "exit"]:
             print (book)
